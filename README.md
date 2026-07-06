@@ -85,3 +85,32 @@ This works better on Railway as a worker/background service than as a web app.
   - Mount a persistent volume and point `STATE_FILE` to something on that volume.
   - Or replace file state with Redis/Postgres later if you want stronger persistence.
 - First deploy tip: keep `ALERT_ON_STARTUP=false` so the service just primes the latest tweet and waits for the next one.
+
+## Deployment Files
+
+This repo now includes explicit deployment metadata so builders do not have to infer the runtime from a single Python file.
+
+- `requirements.txt`: marks this as a Python project for Nixpacks/Railpack
+- `nixpacks.toml`: explicit Nixpacks setup and start command
+- `Dockerfile`: explicit container build
+- `.dockerignore`: trims local-only files from Docker builds
+- `railway.json`: tells Railway how to start the worker
+
+## Railway Checklist
+
+1. Create a Railway service from this repo.
+2. Keep it as a worker/background service.
+3. Set these environment variables:
+   - `NITTER_BASE_URL`
+   - `NITTER_USERNAME`
+   - `POLL_MIN_SECONDS`
+   - `POLL_MAX_SECONDS`
+   - `KEYWORD_RULES`
+   - `ALERT_ON_STARTUP=false`
+   - `MACOS_NOTIFICATIONS=false`
+4. If using Twilio, also set:
+   - `TWILIO_ACCOUNT_SID`
+   - `TWILIO_AUTH_TOKEN`
+   - `TWILIO_FROM_NUMBER`
+   - `ALERT_TO_NUMBER`
+5. If you want persistent last-seen tweet tracking across restarts, attach a volume and set `STATE_FILE` to a mounted path like `/data/icg_last_seen.json`.
